@@ -1,24 +1,23 @@
 import os
 from telegram import Bot
+from telegram.error import TelegramError
 
-def sendMessage(data):
-    tg_bot = Bot(token=os.environ['TOKEN'])
-    channel = os.environ['CHANNEL']
+def send_message(data):
     try:
-        print('--->Sending message to telegram')
-        tg_bot.sendMessage(
-            channel,
-            data,
+        tg_bot = Bot(token=os.environ['TOKEN'])
+        channel = os.environ['CHANNEL']
+
+        print('---> Sending message to telegram')
+        tg_bot.send_message(
+            chat_id=channel,
+            text=data,
             parse_mode="MARKDOWN",
         )
         return True
     except KeyError:
-        print('--->Key error - sending error to telegram')
-        tg_bot.sendMessage(
-            channel,
-            data,
-            parse_mode="MARKDOWN",
-        )
+        print('---> Key error - sending error to telegram')
+    except TelegramError as te:
+        print('---> Telegram Error:', te)
     except Exception as e:
-        print("[X] Telegram Error:\n>", e)
+        print('[X] Unexpected Error:\n>', e)
     return False
