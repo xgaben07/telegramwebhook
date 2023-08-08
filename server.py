@@ -1,21 +1,25 @@
 from flask import Flask, request
 from threading import Thread
-import telegrambot
 import json
+import telegrambot  # Pastikan modul telegrambot sudah diimpor atau didefinisikan
 
-app = Flask(__name__)
+app = Flask('')
 
 
 @app.route('/webhook', methods=['POST', 'GET'])
 def get_webhook():
     try:
-        json_request = request.args.get("jsonRequest")
+        jsonRequest = request.args.get("jsonRequest")
         if request.method == 'POST':
             payload = request.data
-            if json_request == "true":
-                payload = json.dumps(request.json, indent=4)
-                print("received data:\n", payload)
-                telegrambot.send_message(payload)
+            if jsonRequest == "true":
+                payload = json.loads(request.data)
+                payload = json.dumps(payload, indent=4)
+            else:
+                payload = request.data.decode('utf-8')
+
+            print("received data:\n", payload)
+            telegrambot.sendMessage(payload)
             return 'success', 200
         else:
             print("Get request")
@@ -37,8 +41,8 @@ def run():
 
 
 def start_server_async():
-    server = Thread(target=run)
-    server.start()
+    server_thread = Thread(target=run)
+    server_thread.start()
 
 
 def start_server():
@@ -46,4 +50,4 @@ def start_server():
 
 
 if __name__ == '__main__':
-    start_server_async()
+    start_server()
